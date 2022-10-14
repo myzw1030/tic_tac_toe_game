@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tic_tac_toe_game/ui/theme/color.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,6 +26,8 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      backgroundColor: MainColor.primaryColor,
+    );
   }
 }
