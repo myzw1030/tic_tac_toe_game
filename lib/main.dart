@@ -26,6 +26,19 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   String lastValue = 'x';
+  bool gameOver = false;
+  int turn = 0;
+  String result = '';
+  List<int> scoreboard = [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+  ];
 
   Game game = Game();
 
@@ -38,6 +51,8 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double boardWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: MainColor.primaryColor,
       body: Column(
@@ -54,7 +69,99 @@ class _GameScreenState extends State<GameScreen> {
           const SizedBox(
             height: 20.0,
           ),
-          Container(),
+          SizedBox(
+            width: boardWidth,
+            height: boardWidth,
+            child: GridView.count(
+              crossAxisCount: Game.boardlength ~/ 3,
+              padding: const EdgeInsets.all(16.0),
+              mainAxisSpacing: 8.0,
+              crossAxisSpacing: 8.0,
+              children: List.generate(Game.boardlength, (index) {
+                return InkWell(
+                  onTap: gameOver
+                      ? null
+                      : () {
+                          if (game.board![index] == '') {
+                            setState(() {
+                              game.board![index] = lastValue;
+                              turn++;
+                              gameOver = game.winnerCheck(
+                                lastValue,
+                                index,
+                                scoreboard,
+                                3,
+                              );
+                              if (gameOver) {
+                                result = '$lastValue is the Winner';
+                              } else if (!gameOver && turn == 9) {
+                                result = 'It\'s a Draw!';
+                                gameOver = true;
+                              }
+                              if (lastValue == 'x') {
+                                lastValue = 'O';
+                              } else {
+                                lastValue = 'x';
+                              }
+                            });
+                          }
+                        },
+                  child: Container(
+                    width: Game.blockSize,
+                    height: Game.blockSize,
+                    decoration: BoxDecoration(
+                      color: MainColor.secondaryColor,
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    child: Center(
+                      child: Text(
+                        game.board![index],
+                        style: TextStyle(
+                          color: game.board![index] == 'x'
+                              ? Colors.blue
+                              : Colors.pink,
+                          fontSize: 64.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+          const SizedBox(
+            height: 25.0,
+          ),
+          Text(
+            result,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 50.0,
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              setState(() {
+                game.board = Game.initGameBoard();
+                lastValue = 'x';
+                gameOver = false;
+                turn = 0;
+                result = '';
+                scoreboard = [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                ];
+              });
+            },
+            icon: const Icon(Icons.replay),
+            label: const Text('Repeat the Game'),
+          ),
         ],
       ),
     );
